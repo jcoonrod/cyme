@@ -43,7 +43,6 @@
 //! The [`profiler::SystemProfile`] struct contains system [`profiler::Bus`]s, which contain [`profiler::Device`]s as a USB tree.
 #![allow(dead_code)]
 #![warn(missing_docs)]
-use simple_logger::SimpleLogger;
 
 pub mod colour;
 pub mod config;
@@ -62,39 +61,32 @@ pub mod usb;
 
 /// Set cyme module and binary log level
 pub fn set_log_level(debug: u8) -> crate::error::Result<()> {
-    match debug {
+    let mut builder = env_logger::Builder::new();
+    let builder = match debug {
         // just use env if not passed
-        0 => SimpleLogger::new()
-            .with_utc_timestamps()
-            .with_level(log::Level::Error.to_level_filter())
-            // even errors are off as can be noisy
-            .with_module_level("udevrs", log::LevelFilter::Off)
-            .with_module_level("nusb", log::LevelFilter::Off)
-            .env(),
-        1 => SimpleLogger::new()
-            .with_utc_timestamps()
-            .with_module_level("udevrs", log::Level::Warn.to_level_filter())
-            .with_module_level("nusb", log::Level::Warn.to_level_filter())
-            .with_module_level("cyme", log::Level::Info.to_level_filter()),
-        2 => SimpleLogger::new()
-            .with_utc_timestamps()
-            .with_module_level("udevrs", log::Level::Info.to_level_filter())
-            .with_module_level("nusb", log::Level::Info.to_level_filter())
-            .with_module_level("cyme", log::Level::Debug.to_level_filter()),
-        3 => SimpleLogger::new()
-            .with_utc_timestamps()
-            .with_module_level("udevrs", log::Level::Debug.to_level_filter())
-            .with_module_level("nusb", log::Level::Debug.to_level_filter())
-            .with_module_level("cyme", log::Level::Trace.to_level_filter()),
+        0 => builder
+            .parse_default_env()
+            .filter_module("udevrs", log::LevelFilter::Off)
+            .filter_module("nusb", log::LevelFilter::Off),
+        1 => builder
+            .filter_module("udevrs", log::LevelFilter::Warn)
+            .filter_module("nusb", log::LevelFilter::Warn)
+            .filter_module("cyme", log::LevelFilter::Info),
+        2 => builder
+            .filter_module("udevrs", log::LevelFilter::Info)
+            .filter_module("nusb", log::LevelFilter::Info)
+            .filter_module("cyme", log::LevelFilter::Debug),
+        3 => builder
+            .filter_module("udevrs", log::LevelFilter::Debug)
+            .filter_module("nusb", log::LevelFilter::Debug)
+            .filter_module("cyme", log::LevelFilter::Trace),
         // all modules at Trace level
-        _ => SimpleLogger::new()
-            .with_utc_timestamps()
-            .with_level(log::Level::Trace.to_level_filter()),
-    }
-    .init()
-    .map_err(|e| {
+        _ => builder.filter_level(log::LevelFilter::Trace),
+    };
+
+    builder.try_init().map_err(|e| {
         crate::error::Error::new(
-            crate::error::ErrorKind::Other("simple_logger"),
+            crate::error::ErrorKind::Other("logger"),
             &format!("Failed to set log level: {}", e),
         )
     })?;
