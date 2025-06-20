@@ -8,9 +8,7 @@ o---/
             o
 ```
 # Cyme
-
-[![Crates.io](https://img.shields.io/crates/v/cyme?style=flat-square)](https://crates.io/crates/cyme)
-[![docs.rs](https://img.shields.io/docsrs/cyme?style=flat-square)](https://docs.rs/cyme/latest/cyme/)
+This is jcoonrod's Redox-OS version of the tuna-f1sh repository. So far it is replacing nusb with a stub version of my own.
 
 List system USB buses and devices. A modern cross-platform `lsusb` that attempts to maintain compatibility with, but also add new features. Profiles system USB buses and the devices on those buses, including full device descriptors.
 
