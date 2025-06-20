@@ -1,4 +1,4 @@
-d[package]
+[package]
 name = "cyme"
 authors = ["John Whittington <john@jbrengineering.co.uk>", "John Coonrod <jcoonrod51@gmail.com>"]
 description = "List system USB buses and devices. A Redox-OS lsusb"
